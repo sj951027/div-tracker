@@ -20,6 +20,7 @@ td:nth-child(2),th:nth-child(2){text-align:left}
 </style></head>
 <body><div class="wrap">
 <h1>💰 배당 적립 도우미 <span class="sub" style="font-size:12px">— "자기 역사 대비 싼" 순</span></h1>
+<div id="ratebar" class="sub" style="font-size:12.5px;margin:4px 0"></div>
 <div class="warn">⚠️ <b>매수신호 아님 · 적립 참고용.</b> 순위 = ①현재 배당률이 그 종목 <b>자신의 5년 밴드</b>에서
 얼마나 높은 구간인가(=역사적으로 싼 구간인가) + ②최근 5일 낙폭, 두 순위의 동일가중 합(시장별).
 절대 배당률 순위가 아니므로 "폭락 부실주 트랩"을 상당 부분 피하지만, <b>개별 종목의 배당 삭감 뉴스까지
@@ -31,7 +32,7 @@ td:nth-child(2),th:nth-child(2){text-align:left}
 비교가 아니라 "각자 자기 기준으로 싼가"를 재므로, 원래 배당률이 낮은 배당성장주도 공정하게 순위에
 오릅니다.</p>
 <p><b>1일%/5일%</b> — 최근 하락은 적립 타이밍 참고. <b>5Y밴드</b> — 그 종목 배당률의 5년 최저~최고 범위.</p>
-<p><b>5y총수익%/년 (🚩 가드)</b> — 배당을 전부 재투자했다고 치고 계산한 5년 연평균 총수익. <b>이게 음수면 배당을 받아도 가격 하락이 더 커서 자산이 줄어드는 종목</b>이라는 뜻이라, 다른 지표가 아무리 좋아도 🚩와 함께 순위 최하단으로 강등됩니다. 배당률만 보고 구조적 하락주를 모으는 것을 막는 안전장치입니다(과거 5년 기준 — 미래 보장은 아님).</p><p><b>싼가? 를 읽을 때 꼭 같이 볼 것 — 배당변화 1y%</b>. 밴드가 높아지는 경로는 두 가지입니다: 가격이 빠졌거나(진짜 세일), <b>배당이 인상됐거나</b>(좋은 일이지만 가격이 싸진 건 아님). 그래서 <b>싼편 + 배당변화 0% 근처</b> = 가격 하락형 세일, <b>싼편 + 배당변화 큰 플러스</b> = 배당 인상형(밸류업 은행주 등)으로 구분해 읽으세요. 배당변화가 큰 마이너스면 배당 삭감 진행 중 — 주의. 한계 하나: 5년 사이 <b>금리가 크게 움직이면</b> 시장 전체의 적정 배당률 눈높이 자체가 이동하는데 이 표는 그걸 반영하지 못합니다. 금리 급변기엔 밴드를 보수적으로 읽으세요.</p><p><b>추가로 알아둘 것</b> — ① <b>배당락 착시</b>: 1일/5일 하락이 배당락(배당 지급 직후 그만큼 가격이 내려가는 것) 때문일 수 있습니다. 배당락 하락은 '싸진 것'이 아닙니다. ② <b>일회성 특별배당</b>이 끼면 배당률·밴드가 일시적으로 부풀 수 있습니다. ③ 상장 5년 미만 종목(JEPQ 등)은 밴드가 짧은 역사 기준입니다. ④ <b>커버드콜 ETF 주의</b>: 분배금이 배당이 아니라 옵션 프리미엄이라 변동성 장세에 따라 출렁이고, 상방이 제한돼 5y총수익이 원지수보다 낮은 게 정상입니다 — 밴드%는 '분배율이 자기 기준으로 높은 시기'로만 읽으세요. ⑤ <b>⚠ 분배금 데이터 없음</b>: 야후가 한국 ETF 분배금을 누락하는 경우가 있어, 배당률이 0으로 잡히면 순위에서 빼고 이 표시를 답니다 — 실제 무배당이 아니라 데이터 구멍일 수 있으니 운용사 페이지에서 확인하세요.</p><p><b>왜 이렇게 재나</b> — "배당률 높은 순 + 많이 빠진 순"으로 그냥 정렬하면 배당 삭감을 앞둔 폭락주가
+<p><b>5y총수익%/년 (🚩 가드)</b> — 배당을 전부 재투자했다고 치고 계산한 5년 연평균 총수익. <b>이게 음수면 배당을 받아도 가격 하락이 더 커서 자산이 줄어드는 종목</b>이라는 뜻이라, 다른 지표가 아무리 좋아도 🚩와 함께 순위 최하단으로 강등됩니다. 배당률만 보고 구조적 하락주를 모으는 것을 막는 안전장치입니다(과거 5년 기준 — 미래 보장은 아님).</p><p><b>싼가? 를 읽을 때 꼭 같이 볼 것 — 배당변화 1y%</b>. 밴드가 높아지는 경로는 두 가지입니다: 가격이 빠졌거나(진짜 세일), <b>배당이 인상됐거나</b>(좋은 일이지만 가격이 싸진 건 아님). 그래서 <b>싼편 + 배당변화 0% 근처</b> = 가격 하락형 세일, <b>싼편 + 배당변화 큰 플러스</b> = 배당 인상형(밸류업 은행주 등)으로 구분해 읽으세요. 배당변화가 큰 마이너스면 배당 삭감 진행 중 — 주의. <b>※주기변경</b> 표시가 붙어 있으면 연→분기 같은 지급 방식 전환기라 이 숫자가 부풀거나 눌린 것일 수 있으니 그대로 믿지 마세요. 한계 하나: 5년 사이 <b>금리가 크게 움직이면</b> 시장 전체의 적정 배당률 눈높이 자체가 이동하는데 이 표는 그걸 반영하지 못합니다. 금리 급변기엔 밴드를 보수적으로 읽으세요.</p><p><b>추가로 알아둘 것</b> — ① <b>배당락 착시</b>: 1일/5일 하락이 배당락(배당 지급 직후 그만큼 가격이 내려가는 것) 때문일 수 있습니다. 배당락 하락은 '싸진 것'이 아닙니다. ② <b>일회성 특별배당</b>이 끼면 배당률·밴드가 일시적으로 부풀 수 있습니다. ③ 상장 5년 미만 종목(JEPQ 등)은 밴드가 짧은 역사 기준입니다. ④ <b>커버드콜 ETF 주의</b>: 분배금이 배당이 아니라 옵션 프리미엄이라 변동성 장세에 따라 출렁이고, 상방이 제한돼 5y총수익이 원지수보다 낮은 게 정상입니다 — 밴드%는 '분배율이 자기 기준으로 높은 시기'로만 읽으세요. ⑤ <b>⚠ 분배금 데이터 없음</b>: 야후가 한국 ETF 분배금을 누락하는 경우가 있어, 배당률이 0으로 잡히면 순위에서 빼고 이 표시를 답니다 — 실제 무배당이 아니라 데이터 구멍일 수 있으니 운용사 페이지에서 확인하세요.</p><p><b>왜 이렇게 재나</b> — "배당률 높은 순 + 많이 빠진 순"으로 그냥 정렬하면 배당 삭감을 앞둔 폭락주가
 1등을 도배합니다(배당 트랩). 관심종목을 배당 이력이 검증된 것들로 고정하고, 각자 자기 밴드 기준으로
 재는 게 그 함정을 피하는 고전적 방법(일드 밴드)입니다.</p></details>
 <div style="margin:6px 0"><span class="sub" style="font-size:12px">보기: </span><button id="f-all" onclick="setF('all')" style="background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12px">전체</button> <button id="f-ETF" onclick="setF('ETF')" style="background:var(--card);border:1px solid var(--line);color:var(--sub);border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12px">ETF만</button> <button id="f-stock" onclick="setF('stock')" style="background:var(--card);border:1px solid var(--line);color:var(--sub);border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12px">개별주만</button></div><div class="sub" style="font-size:11.5px;margin:2px 0 8px">읽는 법 한 줄: <b>지금 싼가?</b> = 배당률이 자기 5년 역사 상위 몇 %인가 (<b class="pos">80↑ 싼편</b> · 보통 · <b style="color:var(--warn)">20↓ 비싼편</b>) · <b>5년 성적</b> = 배당 재투자 포함 연평균, 🚩 음수는 자산이 줄어든 종목(순위 강등)</div><div id="body">로딩 중…</div>
@@ -51,7 +52,7 @@ function render(d){
       +'<table><thead><tr><th>#</th><th>종목</th><th>구분</th><th title="최근 1년 실제 지급 배당 ÷ 현재가">배당률%</th><th title="최근 1년 지급 횟수 기준: 월(11회 이상)·분기·반기·연">주기</th><th title="최근 1년 배당 총액이 그 전 1년 대비 몇 % 변했나 — 옆의 싼가? 컬럼이 배당 인상 때문인지 가격 하락 때문인지 구분용">배당변화<br>1y%</th><th title="현재 배당률이 자기 5년 역사에서 상위 몇 %인가 — 100에 가까울수록 역사적으로 싼 가격">지금 싼가?</th><th>1일%</th><th>5일%</th><th title="배당을 전부 재투자했다고 치고 5년간 연평균 몇 % 불었나 — 음수(🚩)면 배당 받아도 자산이 줄어든 종목">5년 성적<br>(연평균%)</th><th title="이 종목 배당률이 5년간 오간 범위 — 현재 배당률이 이 범위 어디쯤인지 가늠용">배당률<br>5년 범위</th></tr></thead><tbody>';
     for(const r of g){
       h+='<tr'+(r.rank<=3?' class="top"':'')+'><td>'+r.rank+'</td><td><b>'+r.name+'</b> <span class="sub">'+r.ticker+'</span></td>'
-        +'<td class="sub">'+r.type+'</td><td><b>'+r.cur_yield.toFixed(2)+'</b></td>'+'<td class="sub">'+(r.freq||'—')+'</td>'+'<td>'+(r.div_chg==null?'<span class="sub">—</span>':pn(r.div_chg))+'</td>'
+        +'<td class="sub">'+r.type+'</td><td><b>'+r.cur_yield.toFixed(2)+'</b></td>'+'<td class="sub">'+(r.freq||'—')+'</td>'+'<td>'+(r.div_chg==null?'<span class="sub">—</span>':pn(r.div_chg)+(r.chg_note?' <span class="sub" title="지급 주기가 바뀐 전환기라 1년 비교가 부풀거나 눌릴 수 있음 — 숫자 그대로 믿지 말 것">※주기변경</span>':''))+'</td>'
         +'<td><span class="bar" style="width:'+(r.yield_pctile*0.4)+'px"></span> '+r.yield_pctile.toFixed(0)+' '+(r.nodata?'':bandTxt(r.yield_pctile))+'</td>'
         +'<td>'+pn(r.r1d)+'</td><td>'+pn(r.r5d)+'</td>'+'<td>'+(r.nodata?'<span class="sub">⚠ 분배금 데이터 없음</span>':(r.slump?'🚩 ':'')+pn(r.tr_cagr))+'</td>'
         +'<td class="sub">'+r.yr_min.toFixed(1)+'~'+r.yr_max.toFixed(1)+'%</td></tr>';
@@ -59,6 +60,7 @@ function render(d){
     h+='</tbody></table>';
   }
   document.getElementById('body').innerHTML=h;
+  if(d.rate&&d.rate.us10y!=null){const c=d.rate.chg1m;const dir=Math.abs(c)<0.10?'보합':(c>0?'상승 ↑':'하락 ↓');const col=Math.abs(c)<0.10?'var(--sub)':(c>0?'var(--warn)':'var(--accent)');document.getElementById('ratebar').innerHTML='💹 금리 컨텍스트: 미국 10년물 <b>'+d.rate.us10y.toFixed(2)+'%</b> · 1개월 '+'<b style="color:'+col+'">'+(c>0?'+':'')+c.toFixed(2)+'%p '+dir+'</b>'+' <span class="sub">(하락=고배당·리츠에 우호적 · 상승=은행에 우호적 — 순위와 무관, 참고용)</span>';}
   const up=d.updated||{};document.getElementById('foot').textContent='갱신 — 한국 '+(up.KR||'대기')+' · 미국 '+(up.US||'대기')+(d.fails&&d.fails.length?' · 수집실패: '+d.fails.join(','):'')+' · 세금·환율 미반영 · 매수신호 아님';
 }
 fetch('data.json?t='+Date.now()).then(r=>r.json()).then(d=>{DATA=d;render(d);}).catch(e=>{document.getElementById('body').textContent='data.json 로드 실패 — Actions가 아직 안 돌았을 수 있음';});

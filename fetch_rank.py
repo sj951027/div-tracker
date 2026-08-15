@@ -61,8 +61,19 @@ def analyze(close: pd.Series, divs: pd.Series) -> dict | None:
         return None
     cur_y = float(ys.iloc[-1])
     pctile = float((ys < cur_y).mean()) * 100          # 높을수록 '자기 역사 대비 싼' 상태
-    r1 = float(close.iloc[-1] / close.iloc[-2] - 1) * 100
-    r5 = float(close.iloc[-1] / close.iloc[-6] - 1) * 100 if len(close) >= 6 else np.nan
+    # 낙폭은 '배당 포함(총수익)' 기준 — 배당락(지급만큼 기계적 하락)을 세일로 오인하는 편향 제거
+    d1 = divs.copy()
+    if not d1.empty:
+        d1.index = pd.to_datetime(d1.index).tz_localize(None)
+    ci = pd.to_datetime(close.index)
+    ci = ci.tz_localize(None) if ci.tz is not None else ci
+    def _tr(n):
+        if len(close) < n + 1:
+            return np.nan
+        dv = float(d1[(d1.index > ci[-n-1]) & (d1.index <= ci[-1])].sum()) if not d1.empty else 0.0
+        return float((close.iloc[-1] + dv) / close.iloc[-n-1] - 1) * 100
+    r1 = _tr(1)
+    r5 = _tr(5)
     tr = total_return_cagr(close, divs)
     nodata = bool(cur_y <= 0)   # 야후가 KR ETF 분배금을 누락하는 경우 잦음(실측) — 오해 방지용 분리 표시
     # 지급주기: 최근 365일 지급 횟수로 판별 / 배당 1y 변화: TTM 배당금 now vs 1년 전
@@ -76,12 +87,18 @@ def analyze(close: pd.Series, divs: pd.Series) -> dict | None:
     ttm_now = float(d2[(d2.index > end - pd.Timedelta(days=365)) & (d2.index <= end)].sum()) if not d2.empty else 0.0
     ttm_prv = float(d2[(d2.index > end - pd.Timedelta(days=730)) & (d2.index <= end - pd.Timedelta(days=365))].sum()) if not d2.empty else 0.0
     div_chg = round((ttm_now / ttm_prv - 1) * 100, 1) if ttm_prv > 0 else None
+    # 주기 변경 감지(연→분기 등): 직전 1년 창의 주기 라벨과 다르면 div_chg 왜곡 경고
+    n_prv = int(((d2.index > end - pd.Timedelta(days=730)) & (d2.index <= end - pd.Timedelta(days=365))).sum()) if not d2.empty else 0
+    def _lbl(n):
+        return "월" if n >= 11 else ("분기" if n >= 3 else ("반기" if n == 2 else ("연" if n == 1 else "—")))
+    freq_prv = _lbl(n_prv)
+    chg_note = bool(div_chg is not None and freq != freq_prv and n1y > 0 and n_prv > 0)
     return dict(cur_yield=round(cur_y * 100, 2), yield_pctile=round(pctile, 1),
                 r1d=round(r1, 2), r5d=round(r5, 2),
                 yr_min=round(float(ys.tail(1260).min()) * 100, 2),
                 yr_max=round(float(ys.tail(1260).max()) * 100, 2),
                 tr_cagr=round(tr, 1),
-                freq=freq, div_chg=div_chg,
+                freq=freq, div_chg=div_chg, chg_note=chg_note,
                 nodata=nodata,
                 slump=bool((tr < 0) and not nodata))   # 🚩 배당 포함 총수익 음수(데이터 있는 경우만)
 
@@ -165,12 +182,27 @@ def selftest() -> None:
             dict(market="US", yield_pctile=80, r5d=-1, slump=False)]
     rank_market(rows)
     assert rows[0]["rank"] == 1 and rows[2]["rank"] == 4, rows   # slump 가 지표 최상위여도 꼴찌
+    # 배당락 상쇄: 가격이 배당만큼(1) 떨어진 날 → 가격수익 −1%지만 총수익 낙폭은 ≈0 이어야 함
+    idx3 = pd.date_range("2024-01-01", periods=400, freq="D")
+    px3 = pd.Series(100.0, index=idx3); px3.iloc[-3:] = 99.0     # 이틀 전 배당락으로 1 하락
+    dv3 = pd.Series(1.0, index=pd.date_range("2024-02-01", periods=5, freq="91D"))
+    dv3.index = list(dv3.index[:-1]) + [idx3[-3]]                # 마지막 배당을 배당락일로
+    o3 = analyze(px3, pd.Series(dv3.values, index=dv3.index))
+    assert abs(o3["r5d"]) < 0.2, o3["r5d"]                       # 총수익 기준 ≈ 0 (가격만 보면 −1%)
     # 지급주기·배당변화: 91일 간격 배당 → 분기 / 최근 1년 = 그 전 1년 → 변화 0%
     assert out["freq"] == "분기", out["freq"]
     assert out["div_chg"] is not None and abs(out["div_chg"]) < 1, out["div_chg"]
     monthly = pd.Series(0.1, index=pd.date_range("2022-01-15", periods=50, freq="30D"))
     om = analyze(close, monthly)
     assert om["freq"] == "월", om["freq"]
+    # 주기변경 감지: 과거 1년 연배당(1회) → 최근 1년 분기(4회) 전환이면 chg_note=True
+    sw = pd.Series([4.0, 1.0, 1.0, 1.0, 1.0],
+                   index=pd.to_datetime(["2023-12-20", "2024-10-05", "2025-01-05", "2025-04-05", "2025-07-05"]))
+    idx2 = pd.date_range("2021-01-01", "2025-07-20", freq="D")
+    close2 = pd.Series(100.0, index=idx2)
+    osw = analyze(close2, sw)
+    assert osw["chg_note"] is True and osw["freq"] == "분기", (osw["chg_note"], osw["freq"])
+    assert out["chg_note"] is False, out["chg_note"]   # 꾸준한 분기배당은 경고 없음
     # 이벤트 감지: 79→85 진입만 잡고, 이미 85였던 것·첫 실행(old 없음)은 침묵
     oldr = [dict(ticker="A", market="US", yield_pctile=79, slump=False, name="A", cur_yield=3, tr_cagr=5),
             dict(ticker="B", market="US", yield_pctile=90, slump=False, name="B", cur_yield=4, tr_cagr=5)]
@@ -255,11 +287,29 @@ def main() -> None:
             pass
     rank_market(rows)
     rows.sort(key=lambda r: (r["market"], r["rank"]))
+    # 금리 컨텍스트: 미10Y(^TNX) 수준 + 1개월 변화 — 표시 전용, 실패 시 직전값 보존(비치명)
+    rate = None
+    if out_path.exists():
+        try:
+            rate = json.loads(out_path.read_text(encoding="utf-8")).get("rate")
+        except Exception:
+            pass
+    try:
+        tnx = yf.Ticker("^TNX").history(period="3mo")["Close"].dropna()
+        if len(tnx) >= 15:
+            cur = float(tnx.iloc[-1]); prv = float(tnx.iloc[-min(21, len(tnx))])
+            if cur > 20: cur /= 10
+            if prv > 20: prv /= 10
+            rate = dict(us10y=round(cur, 2), chg1m=round(cur - prv, 2))
+            print(f"미10Y {rate['us10y']}% (1개월 {rate['chg1m']:+.2f}%p)")
+    except Exception as e:
+        print(f"⚠ 금리 수집 실패(직전값 유지): {e}")
+
     now = datetime.now().isoformat(timespec="seconds")
     updated[target if target != "all" else "KR"] = now
     if target == "all":
         updated["US"] = now
-    data = dict(status="ok", generated=now, updated=updated,
+    data = dict(status="ok", generated=now, updated=updated, rate=rate,
                 fails=sorted(set(fails) | set(old_fails)), rows=rows)
     (HERE / "docs").mkdir(exist_ok=True)
     out_path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
