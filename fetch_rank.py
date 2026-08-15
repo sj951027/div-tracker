@@ -281,7 +281,8 @@ def main() -> None:
             old = json.loads(out_path.read_text(encoding="utf-8"))
             rows += [r for r in old.get("rows", []) if r.get("market") != target]
             updated = old.get("updated", {})
-            old_fails = [f for f in old.get("fails", []) if not any(
+            wl_all = set(pd.read_csv(HERE / "watchlist.csv").ticker)
+            old_fails = [f for f in old.get("fails", []) if f in wl_all and not any(
                 f == r.get("ticker") for r in rows)]
         except Exception:
             pass

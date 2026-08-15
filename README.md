@@ -6,7 +6,8 @@
 - `watchlist.csv` — 추적 종목 (수정·추가는 이 파일만)
 - `fetch_rank.py` — 수집·랭킹 (`--selftest` 로 산식 검증)
 - `docs/index.html` + `data.json` — GitHub Pages 표
-- Actions: 매일 KST 07:40 자동 갱신
+- Actions: 한국장 마감 후(KST 16:10) KR 갱신 · 미국장 마감 후(KST 아침 08:10) US 갱신
+- 텔레그램 이벤트 알림(선택): Secrets에 TG_TOKEN·TG_CHAT 등록 시 "싼편 진입·🚩 전환"만 발송
 
 ## 설정 (1회)
 1. GitHub 새 repo(public) 만들고 이 폴더 통째로 push
