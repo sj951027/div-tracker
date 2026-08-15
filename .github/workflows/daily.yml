@@ -20,7 +20,7 @@ jobs:
       - name: commit data
         run: |
           git config user.name bot && git config user.email bot@users.noreply.github.com
-          git pull --rebase || true
           git add docs/data.json
           git diff --cached --quiet || git commit -m "data $(date -u +%Y%m%d-%H%M)"
+          git pull --rebase || true
           git push

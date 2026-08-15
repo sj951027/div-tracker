@@ -19,7 +19,7 @@ MCD,US,McDonald's,stock,배당귀족
 TGT,US,Target,stock,배당귀족
 IBM,US,IBM,stock,고배당 기술
 LMT,US,Lockheed Martin,stock,배당성장 방산
-161510.KS,KR,PLUS 고배당주(구 ARIRANG),ETF,국내 고배당 ETF
+210780.KS,KR,TIGER 코스피고배당,ETF,국내 고배당 ETF
 279530.KS,KR,KODEX 고배당,ETF,국내 고배당 ETF
 329200.KS,KR,TIGER 리츠부동산인프라,ETF,리츠·인프라 월배당
 088980.KS,KR,맥쿼리인프라,stock,인프라 배당 대표
@@ -35,3 +35,12 @@ LMT,US,Lockheed Martin,stock,배당성장 방산
 033780.KS,KR,KT&G,stock,고배당 방어주
 000810.KS,KR,삼성화재,stock,보험 배당성장
 005935.KS,KR,삼성전자우,stock,우선주 배당
+289480.KS,KR,TIGER 200커버드콜ATM,ETF,국내 커버드콜(2018~ 5년 이력)
+441680.KS,KR,TIGER 미국나스닥100커버드콜,ETF,커버드콜 월배당
+458760.KS,KR,TIGER 미국배당+7%프리미엄다우존스,ETF,커버드콜 월배당(2023 상장)
+SO,US,Southern Company,stock,유틸리티 배당 안정
+DUK,US,Duke Energy,stock,유틸리티 배당 안정
+VICI,US,VICI Properties,stock,카지노 리츠 고배당
+016360.KS,KR,삼성증권,stock,증권 고배당
+005830.KS,KR,DB손해보험,stock,보험 저평가 배당
+395400.KS,KR,SK리츠,stock,국내 리츠 분기배당

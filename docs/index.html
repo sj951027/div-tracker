@@ -31,25 +31,28 @@ td:nth-child(2),th:nth-child(2){text-align:left}
 비교가 아니라 "각자 자기 기준으로 싼가"를 재므로, 원래 배당률이 낮은 배당성장주도 공정하게 순위에
 오릅니다.</p>
 <p><b>1일%/5일%</b> — 최근 하락은 적립 타이밍 참고. <b>5Y밴드</b> — 그 종목 배당률의 5년 최저~최고 범위.</p>
-<p><b>5y총수익%/년 (🚩 가드)</b> — 배당을 전부 재투자했다고 치고 계산한 5년 연평균 총수익. <b>이게 음수면 배당을 받아도 가격 하락이 더 커서 자산이 줄어드는 종목</b>이라는 뜻이라, 다른 지표가 아무리 좋아도 🚩와 함께 순위 최하단으로 강등됩니다. 배당률만 보고 구조적 하락주를 모으는 것을 막는 안전장치입니다(과거 5년 기준 — 미래 보장은 아님).</p><p><b>추가로 알아둘 것</b> — ① <b>배당락 착시</b>: 1일/5일 하락이 배당락(배당 지급 직후 그만큼 가격이 내려가는 것) 때문일 수 있습니다. 배당락 하락은 '싸진 것'이 아닙니다. ② <b>일회성 특별배당</b>이 끼면 배당률·밴드가 일시적으로 부풀 수 있습니다. ③ 상장 5년 미만 종목(JEPQ 등)은 밴드가 짧은 역사 기준입니다. ④ <b>⚠ 분배금 데이터 없음</b>: 야후가 한국 ETF 분배금을 누락하는 경우가 있어, 배당률이 0으로 잡히면 순위에서 빼고 이 표시를 답니다 — 실제 무배당이 아니라 데이터 구멍일 수 있으니 운용사 페이지에서 확인하세요.</p><p><b>왜 이렇게 재나</b> — "배당률 높은 순 + 많이 빠진 순"으로 그냥 정렬하면 배당 삭감을 앞둔 폭락주가
+<p><b>5y총수익%/년 (🚩 가드)</b> — 배당을 전부 재투자했다고 치고 계산한 5년 연평균 총수익. <b>이게 음수면 배당을 받아도 가격 하락이 더 커서 자산이 줄어드는 종목</b>이라는 뜻이라, 다른 지표가 아무리 좋아도 🚩와 함께 순위 최하단으로 강등됩니다. 배당률만 보고 구조적 하락주를 모으는 것을 막는 안전장치입니다(과거 5년 기준 — 미래 보장은 아님).</p><p><b>추가로 알아둘 것</b> — ① <b>배당락 착시</b>: 1일/5일 하락이 배당락(배당 지급 직후 그만큼 가격이 내려가는 것) 때문일 수 있습니다. 배당락 하락은 '싸진 것'이 아닙니다. ② <b>일회성 특별배당</b>이 끼면 배당률·밴드가 일시적으로 부풀 수 있습니다. ③ 상장 5년 미만 종목(JEPQ 등)은 밴드가 짧은 역사 기준입니다. ④ <b>커버드콜 ETF 주의</b>: 분배금이 배당이 아니라 옵션 프리미엄이라 변동성 장세에 따라 출렁이고, 상방이 제한돼 5y총수익이 원지수보다 낮은 게 정상입니다 — 밴드%는 '분배율이 자기 기준으로 높은 시기'로만 읽으세요. ⑤ <b>⚠ 분배금 데이터 없음</b>: 야후가 한국 ETF 분배금을 누락하는 경우가 있어, 배당률이 0으로 잡히면 순위에서 빼고 이 표시를 답니다 — 실제 무배당이 아니라 데이터 구멍일 수 있으니 운용사 페이지에서 확인하세요.</p><p><b>왜 이렇게 재나</b> — "배당률 높은 순 + 많이 빠진 순"으로 그냥 정렬하면 배당 삭감을 앞둔 폭락주가
 1등을 도배합니다(배당 트랩). 관심종목을 배당 이력이 검증된 것들로 고정하고, 각자 자기 밴드 기준으로
 재는 게 그 함정을 피하는 고전적 방법(일드 밴드)입니다.</p></details>
-<div id="body">로딩 중…</div>
+<div style="margin:6px 0"><span class="sub" style="font-size:12px">보기: </span><button id="f-all" onclick="setF('all')" style="background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12px">전체</button> <button id="f-ETF" onclick="setF('ETF')" style="background:var(--card);border:1px solid var(--line);color:var(--sub);border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12px">ETF만</button> <button id="f-stock" onclick="setF('stock')" style="background:var(--card);border:1px solid var(--line);color:var(--sub);border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12px">개별주만</button></div><div class="sub" style="font-size:11.5px;margin:2px 0 8px">읽는 법 한 줄: <b>지금 싼가?</b> = 배당률이 자기 5년 역사 상위 몇 %인가 (<b class="pos">80↑ 싼편</b> · 보통 · <b style="color:var(--warn)">20↓ 비싼편</b>) · <b>5년 성적</b> = 배당 재투자 포함 연평균, 🚩 음수는 자산이 줄어든 종목(순위 강등)</div><div id="body">로딩 중…</div>
 <div class="sub" style="font-size:11px" id="foot"></div>
 </div>
 <script>
-fetch('data.json?t='+Date.now()).then(r=>r.json()).then(d=>{
+let DATA=null, FSEL='all';
+function setF(f){ FSEL=f; for(const k of ['all','ETF','stock']){ const b=document.getElementById('f-'+k); b.style.borderColor=k===f?'var(--accent)':'var(--line)'; b.style.color=k===f?'var(--accent)':'var(--sub)'; } if(DATA) render(DATA); }
+function render(d){
   const pn=v=>v==null?'-':'<span class="'+(v>0?'pos':v<0?'neg':'')+'">'+(v>0?'+':'')+v.toFixed(2)+'</span>';
+  const bandTxt=p=> p>=80?'<b class="pos">싼편</b>':(p<=20?'<b style="color:var(--warn)">비싼편</b>':'<span class="sub">보통</span>');
   let h='';
   for(const mkt of ['KR','US']){
-    const g=d.rows.filter(r=>r.market===mkt);
+    const g=d.rows.filter(r=>r.market===mkt&&(FSEL==='all'||r.type===FSEL));
     if(!g.length) continue;
     h+='<div class="mkt">'+(mkt==='KR'?'🇰🇷 한국':'🇺🇸 미국')+'</div>'
-      +'<table><thead><tr><th>#</th><th>종목</th><th>구분</th><th>배당률%</th><th title="자기 5년 밴드 내 백분위 — 높을수록 역사적으로 싼 구간">밴드%</th><th>1일%</th><th>5일%</th><th title="배당 재투자 포함 5년 총수익 연평균 — 음수(🚩)면 배당을 받아도 가격 하락이 더 큰 종목">5y총수익%/년</th><th>5Y밴드</th></tr></thead><tbody>';
+      +'<table><thead><tr><th>#</th><th>종목</th><th>구분</th><th title="최근 1년 실제 지급 배당 ÷ 현재가">배당률%</th><th title="현재 배당률이 자기 5년 역사에서 상위 몇 %인가 — 100에 가까울수록 역사적으로 싼 가격">지금 싼가?</th><th>1일%</th><th>5일%</th><th title="배당을 전부 재투자했다고 치고 5년간 연평균 몇 % 불었나 — 음수(🚩)면 배당 받아도 자산이 줄어든 종목">5년 성적<br>(연평균%)</th><th title="이 종목 배당률이 5년간 오간 범위 — 현재 배당률이 이 범위 어디쯤인지 가늠용">배당률<br>5년 범위</th></tr></thead><tbody>';
     for(const r of g){
       h+='<tr'+(r.rank<=3?' class="top"':'')+'><td>'+r.rank+'</td><td><b>'+r.name+'</b> <span class="sub">'+r.ticker+'</span></td>'
         +'<td class="sub">'+r.type+'</td><td><b>'+r.cur_yield.toFixed(2)+'</b></td>'
-        +'<td><span class="bar" style="width:'+(r.yield_pctile*0.5)+'px"></span> '+r.yield_pctile.toFixed(0)+'</td>'
+        +'<td><span class="bar" style="width:'+(r.yield_pctile*0.4)+'px"></span> '+r.yield_pctile.toFixed(0)+' '+(r.nodata?'':bandTxt(r.yield_pctile))+'</td>'
         +'<td>'+pn(r.r1d)+'</td><td>'+pn(r.r5d)+'</td>'+'<td>'+(r.nodata?'<span class="sub">⚠ 분배금 데이터 없음</span>':(r.slump?'🚩 ':'')+pn(r.tr_cagr))+'</td>'
         +'<td class="sub">'+r.yr_min.toFixed(1)+'~'+r.yr_max.toFixed(1)+'%</td></tr>';
     }
@@ -57,5 +60,6 @@ fetch('data.json?t='+Date.now()).then(r=>r.json()).then(d=>{
   }
   document.getElementById('body').innerHTML=h;
   const up=d.updated||{};document.getElementById('foot').textContent='갱신 — 한국 '+(up.KR||'대기')+' · 미국 '+(up.US||'대기')+(d.fails&&d.fails.length?' · 수집실패: '+d.fails.join(','):'')+' · 세금·환율 미반영 · 매수신호 아님';
-}).catch(e=>{document.getElementById('body').textContent='data.json 로드 실패 — Actions가 아직 안 돌았을 수 있음';});
+}
+fetch('data.json?t='+Date.now()).then(r=>r.json()).then(d=>{DATA=d;render(d);}).catch(e=>{document.getElementById('body').textContent='data.json 로드 실패 — Actions가 아직 안 돌았을 수 있음';});
 </script></body></html>
