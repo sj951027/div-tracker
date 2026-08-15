@@ -65,11 +65,23 @@ def analyze(close: pd.Series, divs: pd.Series) -> dict | None:
     r5 = float(close.iloc[-1] / close.iloc[-6] - 1) * 100 if len(close) >= 6 else np.nan
     tr = total_return_cagr(close, divs)
     nodata = bool(cur_y <= 0)   # 야후가 KR ETF 분배금을 누락하는 경우 잦음(실측) — 오해 방지용 분리 표시
+    # 지급주기: 최근 365일 지급 횟수로 판별 / 배당 1y 변화: TTM 배당금 now vs 1년 전
+    d2 = divs.copy()
+    if not d2.empty:
+        d2.index = pd.to_datetime(d2.index).tz_localize(None)
+    end = pd.to_datetime(close.index[-1]).tz_localize(None) if getattr(close.index, "tz", None) is not None \
+        else pd.to_datetime(close.index[-1])
+    n1y = int(((d2.index > end - pd.Timedelta(days=365)) & (d2.index <= end)).sum()) if not d2.empty else 0
+    freq = "월" if n1y >= 11 else ("분기" if n1y >= 3 else ("반기" if n1y == 2 else ("연" if n1y == 1 else "—")))
+    ttm_now = float(d2[(d2.index > end - pd.Timedelta(days=365)) & (d2.index <= end)].sum()) if not d2.empty else 0.0
+    ttm_prv = float(d2[(d2.index > end - pd.Timedelta(days=730)) & (d2.index <= end - pd.Timedelta(days=365))].sum()) if not d2.empty else 0.0
+    div_chg = round((ttm_now / ttm_prv - 1) * 100, 1) if ttm_prv > 0 else None
     return dict(cur_yield=round(cur_y * 100, 2), yield_pctile=round(pctile, 1),
                 r1d=round(r1, 2), r5d=round(r5, 2),
                 yr_min=round(float(ys.tail(1260).min()) * 100, 2),
                 yr_max=round(float(ys.tail(1260).max()) * 100, 2),
                 tr_cagr=round(tr, 1),
+                freq=freq, div_chg=div_chg,
                 nodata=nodata,
                 slump=bool((tr < 0) and not nodata))   # 🚩 배당 포함 총수익 음수(데이터 있는 경우만)
 
@@ -153,6 +165,12 @@ def selftest() -> None:
             dict(market="US", yield_pctile=80, r5d=-1, slump=False)]
     rank_market(rows)
     assert rows[0]["rank"] == 1 and rows[2]["rank"] == 4, rows   # slump 가 지표 최상위여도 꼴찌
+    # 지급주기·배당변화: 91일 간격 배당 → 분기 / 최근 1년 = 그 전 1년 → 변화 0%
+    assert out["freq"] == "분기", out["freq"]
+    assert out["div_chg"] is not None and abs(out["div_chg"]) < 1, out["div_chg"]
+    monthly = pd.Series(0.1, index=pd.date_range("2022-01-15", periods=50, freq="30D"))
+    om = analyze(close, monthly)
+    assert om["freq"] == "월", om["freq"]
     # 이벤트 감지: 79→85 진입만 잡고, 이미 85였던 것·첫 실행(old 없음)은 침묵
     oldr = [dict(ticker="A", market="US", yield_pctile=79, slump=False, name="A", cur_yield=3, tr_cagr=5),
             dict(ticker="B", market="US", yield_pctile=90, slump=False, name="B", cur_yield=4, tr_cagr=5)]
