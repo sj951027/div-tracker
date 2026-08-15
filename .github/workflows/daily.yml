@@ -17,6 +17,9 @@ jobs:
         with: { python-version: '3.12' }
       - run: pip install yfinance pandas numpy
       - run: python fetch_rank.py --market ${{ github.event_name == 'workflow_dispatch' && 'all' || 'auto' }}
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT: ${{ secrets.TG_CHAT }}
       - name: commit data
         run: |
           git config user.name bot && git config user.email bot@users.noreply.github.com

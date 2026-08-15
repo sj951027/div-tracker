@@ -87,6 +87,44 @@ def rank_market(rows: list[dict]) -> None:
             rows[i]["rank"] = int(rank)
 
 
+def band_events(old_rows: list[dict], new_rows: list[dict], market: str) -> list[str]:
+    """직전 실행 대비 이벤트: '싼편'(밴드>=80) 신규 진입, 🚩 신규 발생. 첫 실행(과거 없음)은 침묵."""
+    old = {r["ticker"]: r for r in old_rows if r.get("market") == market}
+    if not old:
+        return []
+    ev = []
+    for r in new_rows:
+        if r.get("market") != market:
+            continue
+        o = old.get(r["ticker"])
+        if not o:
+            continue
+        if r.get("yield_pctile", 0) >= 80 and o.get("yield_pctile", 100) < 80 and not r.get("nodata"):
+            ev.append(f"🟢 싼편 진입 — {r['name']} (배당률 {r['cur_yield']}%, 밴드 {r['yield_pctile']:.0f})")
+        if r.get("slump") and not o.get("slump"):
+            ev.append(f"🚩 총수익 음수 전환 — {r['name']} (5y {r['tr_cagr']}%/년) · 적립 재검토")
+    return ev
+
+
+def notify_telegram(lines: list[str]) -> None:
+    """이벤트 있을 때만 발송. 토큰 없거나 실패해도 조용히 통과(비치명)."""
+    import os
+    import urllib.parse
+    import urllib.request
+    token = os.environ.get("TG_TOKEN", "").strip()
+    chat = os.environ.get("TG_CHAT", "").strip()
+    if not token or not chat or not lines:
+        return
+    msg = "💰 배당 밴드 알림\n" + "\n".join(lines) + "\n→ sj951027.github.io/div-tracker"
+    try:
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        data = urllib.parse.urlencode({"chat_id": chat, "text": msg}).encode()
+        urllib.request.urlopen(urllib.request.Request(url, data=data), timeout=15)
+        print(f"📨 텔레그램 알림 {len(lines)}건 발송")
+    except Exception as e:
+        print(f"⚠ 텔레그램 발송 실패(무시): {e}")
+
+
 def selftest() -> None:
     """네트워크 없이 산식 검증(합성 데이터)."""
     idx = pd.date_range("2021-01-01", periods=1300, freq="D")
@@ -115,7 +153,15 @@ def selftest() -> None:
             dict(market="US", yield_pctile=80, r5d=-1, slump=False)]
     rank_market(rows)
     assert rows[0]["rank"] == 1 and rows[2]["rank"] == 4, rows   # slump 가 지표 최상위여도 꼴찌
-    print("✅ selftest 통과 (TTM 배당률·밴드 백분위·배당중단·총수익 가드·랭킹)")
+    # 이벤트 감지: 79→85 진입만 잡고, 이미 85였던 것·첫 실행(old 없음)은 침묵
+    oldr = [dict(ticker="A", market="US", yield_pctile=79, slump=False, name="A", cur_yield=3, tr_cagr=5),
+            dict(ticker="B", market="US", yield_pctile=90, slump=False, name="B", cur_yield=4, tr_cagr=5)]
+    newr = [dict(ticker="A", market="US", yield_pctile=85, slump=False, nodata=False, name="A", cur_yield=3.2, tr_cagr=5),
+            dict(ticker="B", market="US", yield_pctile=91, slump=False, nodata=False, name="B", cur_yield=4, tr_cagr=5)]
+    ev = band_events(oldr, newr, "US")
+    assert len(ev) == 1 and "A" in ev[0], ev
+    assert band_events([], newr, "US") == []
+    print("✅ selftest 통과 (TTM 배당률·밴드 백분위·배당중단·총수익 가드·랭킹·이벤트 감지)")
 
 
 def main() -> None:
@@ -172,9 +218,14 @@ def main() -> None:
     if not rows:
         print("❌ 수집 실패 — 네트워크/야후 상태 확인")
         sys.exit(1)
-    # 다른 시장 행은 기존 파일에서 보존(시장 분리 실행)
+    # 다른 시장 행은 기존 파일에서 보존(시장 분리 실행) + 직전 상태로 이벤트 감지
     out_path = HERE / "docs" / "data.json"
-    updated, old_fails = {}, []
+    updated, old_fails, prev_rows = {}, [], []
+    if out_path.exists():
+        try:
+            prev_rows = json.loads(out_path.read_text(encoding="utf-8")).get("rows", [])
+        except Exception:
+            prev_rows = []
     if target != "all" and out_path.exists():
         try:
             old = json.loads(out_path.read_text(encoding="utf-8"))
@@ -195,6 +246,12 @@ def main() -> None:
     (HERE / "docs").mkdir(exist_ok=True)
     out_path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
     print(f"💾 docs/data.json — {target} 갱신, 총 {len(rows)}종목 (실패 {len(fails)}: {fails})")
+    # 이벤트 알림: 싼편(밴드 80) 신규 진입·🚩 전환만 — 평소엔 침묵(적립 도구 철학)
+    mkts = ["KR", "US"] if target == "all" else [target]
+    events = []
+    for m in mkts:
+        events += band_events(prev_rows, rows, m)
+    notify_telegram(events)
 
 
 if __name__ == "__main__":
