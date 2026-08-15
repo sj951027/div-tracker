@@ -1,0 +1,37 @@
+ticker,market,name,type,memo
+SCHD,US,Schwab US Dividend Equity,ETF,배당성장 대표
+VYM,US,Vanguard High Dividend Yield,ETF,고배당 분산
+DGRO,US,iShares Dividend Growth,ETF,배당성장
+VIG,US,Vanguard Dividend Appreciation,ETF,배당성장 대형
+HDV,US,iShares Core High Dividend,ETF,고배당 퀄리티
+SPYD,US,SPDR High Dividend,ETF,고배당 동일가중
+JEPI,US,JPMorgan Equity Premium Income,ETF,커버드콜 월배당
+JEPQ,US,JPMorgan Nasdaq Premium Income,ETF,커버드콜 월배당
+O,US,Realty Income,stock,월배당 리츠
+KO,US,Coca-Cola,stock,배당킹
+PG,US,Procter & Gamble,stock,배당킹
+JNJ,US,Johnson & Johnson,stock,배당킹
+PEP,US,PepsiCo,stock,배당킹
+ABBV,US,AbbVie,stock,배당귀족
+XOM,US,Exxon Mobil,stock,배당귀족
+CVX,US,Chevron,stock,배당귀족
+MCD,US,McDonald's,stock,배당귀족
+TGT,US,Target,stock,배당귀족
+IBM,US,IBM,stock,고배당 기술
+LMT,US,Lockheed Martin,stock,배당성장 방산
+161510.KS,KR,PLUS 고배당주(구 ARIRANG),ETF,국내 고배당 ETF
+279530.KS,KR,KODEX 고배당,ETF,국내 고배당 ETF
+329200.KS,KR,TIGER 리츠부동산인프라,ETF,리츠·인프라 월배당
+088980.KS,KR,맥쿼리인프라,stock,인프라 배당 대표
+105560.KS,KR,KB금융,stock,은행지주
+055550.KS,KR,신한지주,stock,은행지주
+086790.KS,KR,하나금융지주,stock,은행지주
+316140.KS,KR,우리금융지주,stock,은행지주
+175330.KS,KR,JB금융지주,stock,지방은행 고배당
+024110.KS,KR,기업은행,stock,은행
+017670.KS,KR,SK텔레콤,stock,통신 고배당
+030200.KS,KR,KT,stock,통신 고배당
+032640.KS,KR,LG유플러스,stock,통신 고배당
+033780.KS,KR,KT&G,stock,고배당 방어주
+000810.KS,KR,삼성화재,stock,보험 배당성장
+005935.KS,KR,삼성전자우,stock,우선주 배당
