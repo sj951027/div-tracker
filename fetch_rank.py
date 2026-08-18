@@ -116,6 +116,26 @@ def rank_market(rows: list[dict]) -> None:
             rows[i]["rank"] = int(rank)
 
 
+def preserve_failed(rows: list[dict], fails: list[str], prev_rows: list[dict],
+                    prev_updated: dict | None) -> int:
+    """[v1.2] 수집 실패 종목은 직전 행을 보존(stale 표시).
+    실패 시 행이 조용히 사라지고 직전 상태까지 지워져 복구 시 알림이 침묵하는 문제 방지.
+    stale_since = 마지막 성공 실행 시각(최초 실패 시점 기준, 연속 실패에도 유지). 반환: 보존 행 수."""
+    have = {r.get("ticker") for r in rows}
+    kept = 0
+    for p in prev_rows:
+        t = p.get("ticker")
+        if t in fails and t not in have:
+            q = dict(p)
+            q["stale"] = True
+            if not q.get("stale_since"):
+                q["stale_since"] = (prev_updated or {}).get(q.get("market"))
+            rows.append(q)
+            have.add(t)
+            kept += 1
+    return kept
+
+
 def band_events(old_rows: list[dict], new_rows: list[dict], market: str) -> list[str]:
     """직전 실행 대비 이벤트: '싼편'(밴드>=80) 신규 진입, 🚩 신규 발생. 첫 실행(과거 없음)은 침묵."""
     old = {r["ticker"]: r for r in old_rows if r.get("market") == market}
@@ -211,7 +231,23 @@ def selftest() -> None:
     ev = band_events(oldr, newr, "US")
     assert len(ev) == 1 and "A" in ev[0], ev
     assert band_events([], newr, "US") == []
-    print("✅ selftest 통과 (TTM 배당률·밴드 백분위·배당중단·총수익 가드·랭킹·이벤트 감지)")
+    # [v1.2] 수집 실패 보존: 실패 종목은 직전 행이 stale로 유지되고, 이벤트 상태도 이어진다
+    prevr = [dict(ticker="C", market="KR", yield_pctile=79, r5d=-2, slump=False, nodata=False,
+                  name="C", cur_yield=5, tr_cagr=4),
+             dict(ticker="D", market="KR", yield_pctile=50, r5d=0, slump=False, nodata=False,
+                  name="D", cur_yield=3, tr_cagr=4)]
+    cur = [dict(prevr[1])]                                     # D만 수집 성공, C 실패
+    k = preserve_failed(cur, ["C"], prevr, {"KR": "2026-08-18T07:00:00"})
+    c_row = next(r for r in cur if r["ticker"] == "C")
+    assert k == 1 and c_row["stale"] and c_row["stale_since"] == "2026-08-18T07:00:00", c_row
+    assert band_events(prevr, cur, "KR") == []                 # 보존 행 = 직전값 그대로 → 이벤트 없음
+    cur2 = [dict(prevr[1])]                                    # 이튿날도 실패 → 최초 실패 시점 유지
+    k2 = preserve_failed(cur2, ["C"], cur, {"KR": "2026-08-19T07:00:00"})
+    assert next(r for r in cur2 if r["ticker"] == "C")["stale_since"] == "2026-08-18T07:00:00"
+    fresh = [dict(prevr[0], yield_pctile=85), dict(prevr[1])]  # 복구: stale 79 → 85 교차 → 알림 정상
+    ev2 = band_events(cur, fresh, "KR")
+    assert len(ev2) == 1 and "C" in ev2[0], ev2
+    print("✅ selftest 통과 (TTM 배당률·밴드 백분위·배당중단·총수익 가드·랭킹·이벤트 감지·실패보존)")
 
 
 def main() -> None:
@@ -253,10 +289,16 @@ def main() -> None:
                     if "429" not in str(e) and "Rate" not in str(e):
                         raise
             if h is None or h.empty:
+                print(f"  ✗ {w.ticker}: 가격 이력 없음(재시도 소진)")   # [v1.3] 실패 사유 로그
                 fails.append(w.ticker)
                 continue
-            out = analyze(h["Close"].dropna(), t.dividends)
+            divs = t.dividends
+            out = analyze(h["Close"].dropna(), divs)
             if out is None:
+                # [v1.3] 사유 구분 — 2026-08-18 KR 7종 실패가 로그 부재로 소거법 진단이 필요했던 것 방지
+                why = ("분배금 이력 없음(야후 커버리지 구멍 가능)" if divs is None or len(divs) == 0
+                       else ("가격 데이터 부족" if len(h) < 10 else "배당률 시계열 250일 미만(이력 짧음)"))
+                print(f"  ✗ {w.ticker}: {why} — 야후 응답: 가격 {len(h)}행 · 분배금 {0 if divs is None else len(divs)}건")
                 fails.append(w.ticker)
                 continue
             out.update(ticker=w.ticker, market=w.market, name=w["name"],
@@ -270,10 +312,12 @@ def main() -> None:
         sys.exit(1)
     # 다른 시장 행은 기존 파일에서 보존(시장 분리 실행) + 직전 상태로 이벤트 감지
     out_path = HERE / "docs" / "data.json"
-    updated, old_fails, prev_rows = {}, [], []
+    updated, old_fails, prev_rows, prev_updated = {}, [], [], {}
     if out_path.exists():
         try:
-            prev_rows = json.loads(out_path.read_text(encoding="utf-8")).get("rows", [])
+            _old = json.loads(out_path.read_text(encoding="utf-8"))
+            prev_rows = _old.get("rows", [])
+            prev_updated = _old.get("updated", {}) or {}
         except Exception:
             prev_rows = []
     if target != "all" and out_path.exists():
@@ -283,9 +327,13 @@ def main() -> None:
             updated = old.get("updated", {})
             wl_all = set(pd.read_csv(HERE / "watchlist.csv").ticker)
             old_fails = [f for f in old.get("fails", []) if f in wl_all and not any(
-                f == r.get("ticker") for r in rows)]
+                f == r.get("ticker") and not r.get("stale") for r in rows)]   # [v1.2] 신선한 행만 실패 해제
         except Exception:
             pass
+    # [v1.2] 실패 종목 직전 행 보존 — 표에서 사라지지 않고, 복구 시 이벤트 감지도 정상 동작
+    kept = preserve_failed(rows, fails, prev_rows, prev_updated)
+    if kept:
+        print(f"⏸ 수집실패 {kept}종목 직전값 보존")
     rank_market(rows)
     rows.sort(key=lambda r: (r["market"], r["rank"]))
     # 금리 컨텍스트: 미10Y(^TNX) 수준 + 1개월 변화 — 표시 전용, 실패 시 직전값 보존(비치명)
