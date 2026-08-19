@@ -253,7 +253,7 @@ def selftest() -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--selftest", action="store_true")
-    # [v2] 시장 분리 실행: 한국장 마감 후(KST 16:10)엔 KR만, 미국장 마감 후(KST 아침)엔 US만
+    # [v2] 시장 분리 실행: 한국 저녁(KST 20:30, v1.4에서 16:10→이동)엔 KR만, 미국장 마감 후(KST 아침)엔 US만
     #      갱신하고 나머지 시장 행은 기존 data.json 것을 보존한다. auto = UTC 시각으로 판별.
     ap.add_argument("--market", default="auto", choices=["KR", "US", "all", "auto"])
     args = ap.parse_args()
